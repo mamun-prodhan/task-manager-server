@@ -16,8 +16,24 @@ app.use(express.json());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nhx4fnh.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+async function run(){
+    try{
+        const taskCollection = client.db('taskManager').collection('tasks');
+        //post task data from home to database
+        app.post('/tasks', async(req, res)=>{
+            const task = req.body;
+            const result = await taskCollection.insertOne(task);
+            res.send(result);
+        });
+    }
+    finally{
 
+    }
+}
+
+run().catch(err => console.error(err));
 
 
 
