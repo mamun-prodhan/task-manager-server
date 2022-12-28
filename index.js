@@ -27,6 +27,21 @@ async function run(){
             const result = await taskCollection.insertOne(task);
             res.send(result);
         });
+
+        //get task data from database
+        app.get('/tasks', async(req, res)=>{
+            let query = {};
+
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = taskCollection.find(query);
+            const tasks = await cursor.toArray();
+            res.send(tasks);
+        })
+        
     }
     finally{
 
