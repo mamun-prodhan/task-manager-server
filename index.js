@@ -21,12 +21,20 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const taskCollection = client.db('taskManager').collection('tasks');
+        const completedTaskCollection = client.db('taskManager').collection('completedTasks');
         //post task data from home to database
         app.post('/tasks', async(req, res)=>{
             const task = req.body;
             const result = await taskCollection.insertOne(task);
             res.send(result);
         });
+
+        //post completed task data to database
+        app.post("/completedTasks", async(req, res)=>{
+            const completedTask = req.body;
+            const result = await completedTaskCollection.insertOne(completedTask);
+            res.send(result);
+        })
 
         //get task data from database
         app.get('/tasks', async(req, res)=>{
@@ -41,11 +49,33 @@ async function run(){
             const tasks = await cursor.toArray();
             res.send(tasks);
         })
+
+        //get completedTasks data from database
+        app.get('/completedTasks', async(req, res)=>{
+            let query = {};
+
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = completedTaskCollection.find(query);
+            const completedTasks = await cursor.toArray();
+            res.send(completedTasks);
+        })
         
         //delete task
         app.delete("/tasks/:id", async(req, res)=>{
             const id = req.params.id;
             const result = await taskCollection.deleteOne({_id:ObjectId(id)})
+            console.log(result)
+            res.send(result)
+        })
+
+        //delete completed task
+        app.delete("/completedTasks/:id", async(req, res)=>{
+            const id = req.params.id;
+            const result = await completedTaskCollection.deleteOne({_id:ObjectId(id)})
             console.log(result)
             res.send(result)
         })
