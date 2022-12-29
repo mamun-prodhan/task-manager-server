@@ -29,6 +29,23 @@ async function run(){
             res.send(result);
         });
 
+        //update task data
+        app.put('/tasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const data = req.body;
+            const updateDoc = {
+                $set: {
+                    "task": data.newTask,
+                    // "email": data.email,
+                    // "review": data.review
+                },
+            };
+            const result = await taskCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        });
+
         //post completed task data to database
         app.post("/completedTasks", async(req, res)=>{
             const completedTask = req.body;
