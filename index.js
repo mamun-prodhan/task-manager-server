@@ -22,6 +22,7 @@ async function run(){
     try{
         const taskCollection = client.db('taskManager').collection('tasks');
         const completedTaskCollection = client.db('taskManager').collection('completedTasks');
+        const commentsCollection = client.db('taskManager').collection('comments');
         //post task data from home to database
         app.post('/tasks', async(req, res)=>{
             const task = req.body;
@@ -80,6 +81,12 @@ async function run(){
             const completedTasks = await cursor.toArray();
             res.send(completedTasks);
         })
+
+        app.post('/comments', async (req, res) => {
+            const comment = req.body;
+            const result = await commentsCollection.insertOne(comment); 
+            res.send(result);
+        });
         
         //delete task
         app.delete("/tasks/:id", async(req, res)=>{
